@@ -1,25 +1,41 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import "./App.css";
+import ActorProfile from "./components/ActorProfile";
+import ListActor from "./components/ListActor";
+import Search from "./components/Search";
 
-function App() {
+const App = () => {
+  const [actors, setActors] = useState([]);
+  const [keyword, setKeyword] = useState([]);
+
+  useEffect(() => {
+    fetch("https://hp-api.herokuapp.com/api/characters")
+      .then((response) => response.json())
+      .then((data) => setActors(data));
+  }, [keyword]);
+
+  const id = actors.forEach((item, i) => {
+    item.id = i + 1;
+  });
+
+  const filterActors = () => {
+    const filteredActors = actors.filter((actors) => {
+      if (keyword === "") {
+        return actors;
+      }
+
+      const newActor = actors.name.toLowerCase().includes(keyword.toLowerCase());
+      return newActor;
+    });
+    setActors(filteredActors)
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Search keyword={keyword} setKeyword={setKeyword} filterActors={filterActors}/>
+      <ListActor actors={actors} id={id} />
     </div>
   );
-}
+};
 
 export default App;
